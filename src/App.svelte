@@ -31,9 +31,10 @@
     if(lines[0].up.length > 0) {
       if (!lines[lines.length - 1].up.length) {
         lines = [...lines.slice(0, lines.length - 1)];
+      } else {
+        lines[lines.length - 1].up = [...lines[lines.length - 1].up.slice(0, lines[lines.length - 1].up.length - 1)];
+        lines[lines.length - 1].down = [...lines[lines.length - 1].down.slice(0, lines[lines.length - 1].down.length - 1)];
       }
-      lines[lines.length - 1].up = [...lines[lines.length - 1].up.slice(0, lines[lines.length - 1].up.length - 1)];
-      lines[lines.length - 1].down = [...lines[lines.length - 1].down.slice(0, lines[lines.length - 1].down.length - 1)];
     }
   }
 
@@ -75,7 +76,7 @@
   </div>
   <h1 class="just-on-print">{titleSong}</h1>
 	{#each lines as line, indexLine }
-    <div  in:fade out:fade  class="line {indexLine === lines.length - 1 ? 'current-line' : ''}">
+    <div in:fade out:fade  class="line {indexLine === lines.length - 1 ? 'current-line' : ''}">
       <div class="container">
         {#each line.up as marks}
           <div class="mark">
