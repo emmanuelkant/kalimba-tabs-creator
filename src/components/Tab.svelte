@@ -1,6 +1,22 @@
 <script>
   import { fade } from 'svelte/transition';
   import { lines } from '../store/lines';
+  import { editMode, deleteMode } from '../store/modes';
+  import { currentTarget } from '../store/current-target';
+
+  const { set } = currentTarget;
+  const { deleteAt } = lines;
+
+  function handleChordClick(lineIndex, markIndex) {
+    console.log({edit: $editMode, delete: $deleteMode})
+    if ($editMode) {
+      set(lineIndex, markIndex);
+    }
+
+    if ($deleteMode) {
+      deleteAt([lineIndex, markIndex]);
+    }
+  }
 </script>
 
 <style>
@@ -36,8 +52,8 @@
 {#each $lines as line, indexLine }
   <div in:fade out:fade  class="line {indexLine === $lines.length - 1 ? 'current-line' : ''}">
     <div class="container">
-      {#each line.up as marks}
-        <div class="mark">
+      {#each line.up as marks, markIndex}
+        <div on:click={() => handleChordClick(indexLine, markIndex)} class="mark">
           {#if marks}
             <span>{marks}</span>
           {:else}
@@ -47,8 +63,8 @@
       {/each}
     </div>
     <div class="container">
-      {#each line.down as marks}
-        <div class="mark">
+      {#each line.down as marks, markIndex}
+        <div on:click={() => handleChordClick(indexLine, markIndex)} class="mark">
           <span>{marks}</span>
         </div>
       {/each}

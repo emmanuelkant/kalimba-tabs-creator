@@ -1,29 +1,55 @@
 <script>
   import { toggle } from '../helper';
   import { lines } from '../store/lines';
+  import { editMode, deleteMode } from '../store/modes';
+  import { currentTarget } from '../store/current-target';
   
-  const { add, backspace, newLine, changeChordType } = lines;
+  const { add, edit, backspace, newLine, changeChordType } = lines;
+  const { toggle: toggleEditMode, turnOff: turnOffEditMode } = editMode;
+  const { toggle: toggleDeleteMode, turnOff: turnOffDeleteMode } = deleteMode;
   let buttons = ['1', '2', '3', '4', '5', '6', '7'];
 
   function changeAllChordType() {
     buttons = buttons.map(toggle);
     changeChordType(toggle);
   }
+
+  function handleClick(chord, octave) {
+    if ($editMode) {
+      edit(chord, octave, $currentTarget);
+    } else {
+      add(chord, octave)
+    }
+  }
+
+  function handleEditClick() {
+    if ($deleteMode) {
+      turnOffDeleteMode();
+    }
+    toggleEditMode();
+  }
+
+  function handleDeleteClick() {
+    if ($editMode) {
+      turnOffEditMode();
+    }
+    toggleDeleteMode();
+  }
 </script>
 
 <div class="no-print">
   {#each buttons as button }
-    <button class="chord-button" on:click={() => add(button, '..')}>{button}**</button>
+    <button class="chord-button" on:click={() => handleClick(button, '..')}>{button}**</button>
   {/each}
 </div>
 <div class="no-print">
   {#each buttons as button }
-    <button class="chord-button" on:click={() => add(button, '.')}>{button}*</button>
+    <button class="chord-button" on:click={() => handleClick(button, '.')}>{button}*</button>
   {/each}
 </div>
 <div class="no-print">
   {#each buttons as button }
-    <button class="chord-button" on:click={() => add(button, '')}>{button}</button>
+    <button class="chord-button" on:click={() => handleClick(button, '')}>{button}</button>
   {/each}
 </div>
 <div class="no-print">
@@ -32,8 +58,8 @@
   <button on:click={() => add('', '')}>Space</button>
   <button on:click={() => backspace()}>Backspace</button>
   <button on:click={() => newLine()}>New Line</button>
-  <button>Edit</button>
-  <button>Delete</button>
+  <button on:click={handleEditClick}>Edit</button>
+  <button on:click={handleDeleteClick}>Delete</button>
   <button on:click={() => changeAllChordType()}>Toggle Chords</button>
 </div>
 

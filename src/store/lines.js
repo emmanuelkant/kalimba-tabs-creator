@@ -11,6 +11,31 @@ function createLinesStore() {
     });
   };
 
+  function edit(nextChord, nextOctave, position) {
+    update(oldLines => {
+      oldLines[position[0]].up[position[1]] = nextOctave;
+      oldLines[position[0]].down[position[1]] = nextChord;
+      return oldLines;
+    });
+  };
+
+  function deleteAt(position) {
+    update(oldLines => {
+      const newUpAndDown = oldLines[position[0]];
+      newUpAndDown.up = [
+        ...newUpAndDown.up.slice(0, position[1]),
+        ...newUpAndDown.up.slice(position[1] + 1)
+      ];
+      newUpAndDown.down = [
+        ...newUpAndDown.down.slice(0, position[1]),
+        ...newUpAndDown.down.slice(position[1] + 1)
+      ];
+      oldLines[position[0]] = newUpAndDown;
+
+      return oldLines;
+    });
+  };
+
   function backspace() {
     update(oldLines => {
       if(oldLines[0].up.length > 0) {
@@ -50,6 +75,8 @@ function createLinesStore() {
 		backspace,
     newLine,
     changeChordType,
+    deleteAt,
+    edit,
 		reset
 	};
 };
