@@ -5,13 +5,9 @@
 
 	let lines = [
     {
-      up: ['..', '', '', '..', '', '', '', '..', '.', ''],
-      down: ['1', '2', '3', '4', '', '3', '(', '4', '3', ')']
+      up: [],
+      down: []
     },
-    {
-      up: ['..', '', '', '..', '', '', '', '..', '.', ''],
-      down: ['1', '2', '3', '4', '', '3', '(', '4', '3', ')']
-    }
   ];
 
   function toggle(target) {
@@ -79,9 +75,13 @@
   <h1 class="just-on-print">{titleSong}</h1>
 	{#each lines as line }
     <div class="container">
-      {#each line.up as marks, markIndex}
+      {#each line.up as marks}
         <div class="mark">
-          <span>{marks}</span>
+          {#if marks}
+            <span>{marks}</span>
+          {:else}
+            <span>&nbsp;</span>
+          {/if}
         </div>
       {/each}
     </div>
