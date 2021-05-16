@@ -1,15 +1,9 @@
 <script>
   import { map } from './config';
-  import { fade, fly } from 'svelte/transition';
+  import { fade } from 'svelte/transition';
+  import { lines } from './store/lines';
   let titleSong = '';
   let buttons = ['1', '2', '3', '4', '5', '6', '7'];
-
-	let lines = [
-    {
-      up: [],
-      down: []
-    },
-  ];
 
   function toggle(target) {
     return map[target] || target;
@@ -18,29 +12,38 @@
   function changeChordType() {
     buttons = buttons.map(toggle);
 
-    lines = lines.map(({ up, down }) => ({ up, down: down.map(toggle) }));
+    lines.update(oldLines => oldLines.map(({ up, down }) => ({ up, down: down.map(toggle) })));
   }
 
   function add(nextChord, nextOctave) {
-    const targetLine = lines[lines.length - 1];
-    lines[lines.length - 1].up = [...targetLine.up, nextOctave];
-    lines[lines.length - 1].down = [...targetLine.down, nextChord];
+    lines.update(oldLines => {
+      const targetLine = oldLines[oldLines.length - 1];
+      oldLines[oldLines.length - 1].up = [...targetLine.up, nextOctave];
+      oldLines[oldLines.length - 1].down = [...targetLine.down, nextChord];
+      return oldLines;
+    })
   }
 
   function backspace() {
-    if(lines[0].up.length > 0) {
-      if (!lines[lines.length - 1].up.length) {
-        lines = [...lines.slice(0, lines.length - 1)];
+    if($lines[0].up.length > 0) {
+      if (!$lines[$lines.length - 1].up.length) {
+        lines.update(oldLines => [...oldLines.slice(0, oldLines.length - 1)]);
       } else {
-        lines[lines.length - 1].up = [...lines[lines.length - 1].up.slice(0, lines[lines.length - 1].up.length - 1)];
-        lines[lines.length - 1].down = [...lines[lines.length - 1].down.slice(0, lines[lines.length - 1].down.length - 1)];
+        lines.update(oldLines => {
+          oldLines[oldLines.length - 1].up = [...oldLines[oldLines.length - 1].up.slice(0, oldLines[oldLines.length - 1].up.length - 1)];
+          oldLines[oldLines.length - 1].down = [...oldLines[oldLines.length - 1].down.slice(0, oldLines[oldLines.length - 1].down.length - 1)];
+          return oldLines;
+        });
+
       }
     }
   }
 
   function newLine() {
-    if (lines[lines.length - 1].up.length) {
-      lines = [...lines, { up: [], down: [] }];
+    if ($lines[$lines.length - 1].up.length) {
+      lines.update(oldLines => {
+        return [...oldLines, { up: [], down: [] }]; 
+      });
     }
   }
 </script>
@@ -75,8 +78,8 @@
     <input bind:value={titleSong}  type="text" placeholder="What is the song name?"/>
   </div>
   <h1 class="just-on-print">{titleSong}</h1>
-	{#each lines as line, indexLine }
-    <div in:fade out:fade  class="line {indexLine === lines.length - 1 ? 'current-line' : ''}">
+	{#each $lines as line, indexLine }
+    <div in:fade out:fade  class="line {indexLine === $lines.length - 1 ? 'current-line' : ''}">
       <div class="container">
         {#each line.up as marks}
           <div class="mark">
