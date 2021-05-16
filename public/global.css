@@ -8,6 +8,8 @@ html, body {
 	width: 100%;
 	height: 100%;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	background: rgb(255,252,248);
+	background: linear-gradient(180deg, rgba(255,252,248,1) 0%, rgba(252,246,237,1) 100%);
 }
 
 .just-on-print {
@@ -22,6 +24,10 @@ html, body {
 		font-size: 40px;
 		margin-bottom: 10px;
 		border-bottom: 2px solid black;
+	}
+
+	* {
+		box-shadow: none !important;
 	}
 	
     .no-print, .no-print * {

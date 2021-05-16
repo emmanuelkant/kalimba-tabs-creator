@@ -1,5 +1,6 @@
 <script>
   import { map } from './config';
+  import { fade, fly } from 'svelte/transition';
   let titleSong = '';
   let buttons = ['1', '2', '3', '4', '5', '6', '7'];
 
@@ -46,17 +47,17 @@
 <main>
   <div class="container button-container no-print">
     {#each buttons as button }
-      <button on:click={() => add(button, '')}>{button}</button>
+      <button class="chord-button" on:click={() => add(button, '..')}>{button}**</button>
     {/each}
   </div>
   <div class="container button-container no-print">
     {#each buttons as button }
-      <button on:click={() => add(button, '.')}>{button}*</button>
+      <button class="chord-button" on:click={() => add(button, '.')}>{button}*</button>
     {/each}
   </div>
   <div class="container button-container no-print">
     {#each buttons as button }
-      <button on:click={() => add(button, '..')}>{button}**</button>
+      <button class="chord-button" on:click={() => add(button, '')}>{button}</button>
     {/each}
   </div>
   <div class="container button-container no-print">
@@ -73,24 +74,26 @@
     <input bind:value={titleSong}  type="text" placeholder="What is the song name?"/>
   </div>
   <h1 class="just-on-print">{titleSong}</h1>
-	{#each lines as line }
-    <div class="container">
-      {#each line.up as marks}
-        <div class="mark">
-          {#if marks}
+	{#each lines as line, indexLine }
+    <div  in:fade out:fade  class="line {indexLine === lines.length - 1 ? 'current-line' : ''}">
+      <div class="container">
+        {#each line.up as marks}
+          <div class="mark">
+            {#if marks}
+              <span>{marks}</span>
+            {:else}
+              <span>&nbsp;</span>
+            {/if}
+          </div>
+        {/each}
+      </div>
+      <div class="container">
+        {#each line.down as marks}
+          <div class="mark">
             <span>{marks}</span>
-          {:else}
-            <span>&nbsp;</span>
-          {/if}
-        </div>
-      {/each}
-    </div>
-    <div class="container">
-      {#each line.down as marks}
-        <div class="mark">
-          <span>{marks}</span>
-        </div>
-      {/each}
+          </div>
+        {/each}
+      </div>
     </div>
   {/each}
 </main>
@@ -103,13 +106,26 @@
 
   .button-container {
     margin: 10px 0;
-    gap: 8px;
+    gap: 15px;
   }
 
   button {
     padding: 8px;
     font-size: 20px;
     cursor: pointer;
+    border: 0;
+    border-radius: 4px;
+    background-color: #faebd7;
+    box-shadow: 0px 0px 1px 1px rgba(0, 0, 0, 0.2);
+    transition: all 0.1s ease-in-out;
+  }
+
+  button:hover {
+    box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.7);
+  }
+
+  .chord-button {
+    width: 45px;
   }
 
   .mark {
@@ -127,5 +143,19 @@
     font-size: 20px;
     border: 0;
     text-align: center;
+    background-color: transparent;
+  }
+
+  .current-line {
+    box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+    background-color: #faebd7;
+  }
+
+  .line {
+    min-height: 70px;
+    max-width: 1280px;
+    margin: 0 auto;
+    transition: all 0.2s ease-in-out;
   }
 </style>
