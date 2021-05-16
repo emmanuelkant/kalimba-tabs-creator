@@ -6,9 +6,10 @@
 
   const { set } = currentTarget;
   const { deleteAt } = lines;
+  let someModeOn = false;
+  let stringCurrentTarget = '';
 
   function handleChordClick(lineIndex, markIndex) {
-    console.log({edit: $editMode, delete: $deleteMode})
     if ($editMode) {
       set(lineIndex, markIndex);
     }
@@ -17,6 +18,14 @@
       deleteAt([lineIndex, markIndex]);
     }
   }
+
+  $: if ($editMode || $deleteMode) {
+    someModeOn = true;
+  } else {
+    someModeOn = false;
+  }
+
+  $: stringCurrentTarget = `${$currentTarget[0]}${$currentTarget[1]}`;
 </script>
 
 <style>
@@ -29,6 +38,7 @@
     display: flex;
     justify-content: center;
     flex-basis: 25px;
+    transition: all 0.2s ease-in-out;
   }
 
   span {
@@ -47,13 +57,34 @@
     margin: 0 auto;
     transition: all 0.2s ease-in-out;
   }
+
+  .modes-on {
+    cursor: pointer;
+  }
+
+  .modes-on:hover {
+    box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.5);
+  }
+
+  .edit-target-up {
+    background-color: #cec1b0;
+    transform: scale(1.2) translate3d(0, -5px, 0);
+  }
+
+  .edit-target-down {
+    background-color: #cec1b0;
+    transform: scale(1.2) translate3d(0, 5px, 0);
+  }
 </style>
 
 {#each $lines as line, indexLine }
-  <div in:fade out:fade  class="line {indexLine === $lines.length - 1 ? 'current-line' : ''}">
+  <div in:fade out:fade class="line {indexLine === $lines.length - 1 ? 'current-line' : ''}">
     <div class="container">
       {#each line.up as marks, markIndex}
-        <div on:click={() => handleChordClick(indexLine, markIndex)} class="mark">
+        <div
+          on:click={() => handleChordClick(indexLine, markIndex)}
+          class="mark {stringCurrentTarget === `${indexLine}${markIndex}` ? 'edit-target-up' : ''}"
+        >
           {#if marks}
             <span>{marks}</span>
           {:else}
@@ -64,7 +95,10 @@
     </div>
     <div class="container">
       {#each line.down as marks, markIndex}
-        <div on:click={() => handleChordClick(indexLine, markIndex)} class="mark">
+        <div
+          on:click={() => handleChordClick(indexLine, markIndex)}
+          class="mark {someModeOn ? 'modes-on' : ''} {stringCurrentTarget === `${indexLine}${markIndex}` ? 'edit-target-down' : ''}"
+        >
           <span>{marks}</span>
         </div>
       {/each}

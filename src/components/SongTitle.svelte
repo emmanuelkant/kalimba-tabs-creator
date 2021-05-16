@@ -19,6 +19,6 @@
 </style>
 
 <div class="no-print">
-  <input bind:value={titleSong}  type="text" placeholder="What is the song name?"/>
+  <input bind:value={titleSong} type="text" placeholder="What is the song name?"/>
 </div>
 <h1 class="just-on-print">{titleSong}</h1>

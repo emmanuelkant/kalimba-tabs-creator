@@ -7,12 +7,14 @@
   const { add, edit, backspace, newLine, changeChordType } = lines;
   const { toggle: toggleEditMode, turnOff: turnOffEditMode } = editMode;
   const { toggle: toggleDeleteMode, turnOff: turnOffDeleteMode } = deleteMode;
+  const { clear } = currentTarget;
   let buttons = ['1', '2', '3', '4', '5', '6', '7'];
+  let someModeOn = false;
 
   function changeAllChordType() {
     buttons = buttons.map(toggle);
     changeChordType(toggle);
-  }
+  };
 
   function handleClick(chord, octave) {
     if ($editMode) {
@@ -20,20 +22,28 @@
     } else {
       add(chord, octave)
     }
-  }
+  };
 
   function handleEditClick() {
     if ($deleteMode) {
       turnOffDeleteMode();
     }
+    clear();
     toggleEditMode();
-  }
+  };
 
   function handleDeleteClick() {
     if ($editMode) {
       turnOffEditMode();
     }
+    clear();
     toggleDeleteMode();
+  };
+
+  $: if ($editMode || $deleteMode) {
+    someModeOn = true;
+  } else {
+    someModeOn = false;
   }
 </script>
 
@@ -53,11 +63,11 @@
   {/each}
 </div>
 <div class="no-print">
-  <button on:click={() => add('(', '')}>(</button>
-  <button on:click={() => add(')', '')}>)</button>
-  <button on:click={() => add('', '')}>Space</button>
-  <button on:click={() => backspace()}>Backspace</button>
-  <button on:click={() => newLine()}>New Line</button>
+  <button on:click={() => handleClick('(', '')}>(</button>
+  <button on:click={() => handleClick(')', '')}>)</button>
+  <button on:click={() => handleClick('', '')}>Space</button>
+  <button disabled={someModeOn} on:click={() => backspace()}>Backspace</button>
+  <button disabled={someModeOn} on:click={() => newLine()}>New Line</button>
   <button on:click={handleEditClick}>Edit</button>
   <button on:click={handleDeleteClick}>Delete</button>
   <button on:click={() => changeAllChordType()}>Toggle Chords</button>
@@ -82,7 +92,11 @@
     transition: all 0.1s ease-in-out;
   }
 
-  button:hover {
+  button:disabled {
+    cursor: initial;
+  }
+
+  button:hover:not(:disabled) {
     box-shadow: 0px 0px 3px 1px rgba(0, 0, 0, 0.7);
   }
 
