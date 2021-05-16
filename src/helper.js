@@ -14,3 +14,7 @@ export const map = {
   A: '6',
   B: '7',
 }
+
+export function toggle(target) {
+  return map[target] || target;
+}

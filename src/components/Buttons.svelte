@@ -1,69 +1,32 @@
 <script>
-  import { map } from './config';
-  import { fade } from 'svelte/transition';
-  import { lines } from './store/lines';
-  let titleSong = '';
+  import { toggle } from '../helper';
+  import { lines } from '../store/lines';
+  
+  const { add, backspace, newLine, changeChordType } = lines;
   let buttons = ['1', '2', '3', '4', '5', '6', '7'];
 
-  function toggle(target) {
-    return map[target] || target;
-  }
-
-  function changeChordType() {
+  function changeAllChordType() {
     buttons = buttons.map(toggle);
-
-    lines.update(oldLines => oldLines.map(({ up, down }) => ({ up, down: down.map(toggle) })));
-  }
-
-  function add(nextChord, nextOctave) {
-    lines.update(oldLines => {
-      const targetLine = oldLines[oldLines.length - 1];
-      oldLines[oldLines.length - 1].up = [...targetLine.up, nextOctave];
-      oldLines[oldLines.length - 1].down = [...targetLine.down, nextChord];
-      return oldLines;
-    })
-  }
-
-  function backspace() {
-    if($lines[0].up.length > 0) {
-      if (!$lines[$lines.length - 1].up.length) {
-        lines.update(oldLines => [...oldLines.slice(0, oldLines.length - 1)]);
-      } else {
-        lines.update(oldLines => {
-          oldLines[oldLines.length - 1].up = [...oldLines[oldLines.length - 1].up.slice(0, oldLines[oldLines.length - 1].up.length - 1)];
-          oldLines[oldLines.length - 1].down = [...oldLines[oldLines.length - 1].down.slice(0, oldLines[oldLines.length - 1].down.length - 1)];
-          return oldLines;
-        });
-
-      }
-    }
-  }
-
-  function newLine() {
-    if ($lines[$lines.length - 1].up.length) {
-      lines.update(oldLines => {
-        return [...oldLines, { up: [], down: [] }]; 
-      });
-    }
+    changeChordType(toggle);
   }
 </script>
 
-<div class="container button-container no-print">
+<div class="no-print">
   {#each buttons as button }
     <button class="chord-button" on:click={() => add(button, '..')}>{button}**</button>
   {/each}
 </div>
-<div class="container button-container no-print">
+<div class="no-print">
   {#each buttons as button }
     <button class="chord-button" on:click={() => add(button, '.')}>{button}*</button>
   {/each}
 </div>
-<div class="container button-container no-print">
+<div class="no-print">
   {#each buttons as button }
     <button class="chord-button" on:click={() => add(button, '')}>{button}</button>
   {/each}
 </div>
-<div class="container button-container no-print">
+<div class="no-print">
   <button on:click={() => add('(', '')}>(</button>
   <button on:click={() => add(')', '')}>)</button>
   <button on:click={() => add('', '')}>Space</button>
@@ -71,16 +34,13 @@
   <button on:click={() => newLine()}>New Line</button>
   <button>Edit</button>
   <button>Delete</button>
-  <button on:click={() => changeChordType()}>Toggle Chords</button>
+  <button on:click={() => changeAllChordType()}>Toggle Chords</button>
 </div>
 
 <style>
-  .container {
+  div {
     display: flex;
     justify-content: center;
-  }
-
-  .button-container {
     margin: 10px 0;
     gap: 15px;
   }
